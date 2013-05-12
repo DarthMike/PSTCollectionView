@@ -298,18 +298,20 @@
 
     for (PSTCollectionReusableView *view in [[_collectionView visibleViewsDict] objectEnumerator]) {
         PSTCollectionViewLayoutAttributes *attr = [view.layoutAttributes copy];
-        if (attr.isCell) {
-
-            NSInteger index = [update[@"oldModel"] globalIndexForItemAtIndexPath:[attr indexPath]];
-
-            if(index != NSNotFound) {
-                index = [update[@"oldToNewIndexMap"][index] intValue];
+        if (attr) {
+            if (attr.isCell) {
                 
-                [attr setIndexPath:[attr indexPath]];
+                NSInteger index = [update[@"oldModel"] globalIndexForItemAtIndexPath:[attr indexPath]];
                 
+                if(index != NSNotFound) {
+                    index = [update[@"oldToNewIndexMap"][index] intValue];
+                    
+                    [attr setIndexPath:[attr indexPath]];
+                    
+                }
             }
+            _initialAnimationLayoutAttributesDict[[PSTCollectionViewItemKey collectionItemKeyForLayoutAttributes:attr]] = attr;
         }
-        _initialAnimationLayoutAttributesDict[[PSTCollectionViewItemKey collectionItemKeyForLayoutAttributes:attr]] = attr;
     }
 
     PSTCollectionViewData* collectionViewData = [_collectionView collectionViewData];

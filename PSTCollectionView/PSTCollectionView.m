@@ -956,6 +956,13 @@ static void PSTCollectionViewCommonSetup(PSTCollectionView *_self) {
 }
 
 - (void)deleteSections:(NSIndexSet *)sections {
+    NSMutableArray* deletePaths = [NSMutableArray new];
+    [sections enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        for (int i = 0;i<[self numberOfItemsInSection:idx];++i) {
+            [deletePaths addObject:[NSIndexPath indexPathForItem:i inSection:idx]];
+        }
+    }];
+    [self deleteItemsAtIndexPaths:deletePaths];
     [self updateSections:sections updateAction:PSTCollectionUpdateActionDelete];
 }
 
@@ -2017,7 +2024,9 @@ static void PSTCollectionViewCommonSetup(PSTCollectionView *_self) {
         switch (updateItem.updateAction) {
             case PSTCollectionUpdateActionDelete: {
                 if(updateItem.isSectionOperation) {
-                    [newModel removeObjectAtIndex:updateItem.indexPathBeforeUpdate.section];
+                    // section updates are ignored anyway in animation code. If not commented, mixing
+                    // rows and section deletion causes crash in else below
+                    //[newModel removeObjectAtIndex:updateItem.indexPathBeforeUpdate.section];
                 } else {
                     [(NSMutableArray*)newModel[updateItem.indexPathBeforeUpdate.section]
                      removeObjectAtIndex:updateItem.indexPathBeforeUpdate.item];
